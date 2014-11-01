@@ -1,89 +1,90 @@
-#include <cstdlib>
-#include <iostream>
-#include <string>
 #include <cstdio>
-#include <sstream>
+#include <algorithm>
 
 int matriz[22][22];
+int aux[22][22];
 int visitado[22];
-int nroCase, countRoutes;
+int nroCase, countRoutes, streetcorners;
+int max = 0;
+int nros[22];
 
-void fireback(int inicio, int fim, std::string res)
+void fireback(int inicio, int fim)
 {
 	int i;
-	visitado[inicio] = 1;
-
-	if (inicio > 1)
+	if (fim == streetcorners)
 	{
-		std::stringstream sstm;
-		sstm << res << " " << inicio;
-		res = sstm.str();
-	}
-	else
-	{
-		std::stringstream sstm;
-		sstm << res << inicio;
-		res = sstm.str();
+            countRoutes++;
+            for(i = 0; i < inicio; i++)
+            {
+                if(i)
+                    std::printf(" ");
+                std::printf("%d", nros[i]);
+            }
+            std::puts("");
+            return;
 	}
 
-	if (inicio == fim)
+	for (i = 1; i <= max; ++i)
 	{
-		std::cout << res << std::endl;
-		visitado[inicio] = 0;
-		countRoutes++;
-		return;
-	}
-
-	for (i = 1; i <= 21; i++)
-	{
-		if (!visitado[i])
-		{
-			if (matriz[inicio][i])
-			{
-				fireback(i, fim, res);
-				continue;
-			}
-			if (matriz[i][inicio])
-			{
-				fireback(i, fim, res);
-			}
-		}
-	}
-	visitado[inicio] = 0;
+            if (visitado[i])
+                continue;
+            if(!matriz[fim][i])
+                continue;
+            if(!aux[i][streetcorners])
+                continue;
+            visitado[i] = 1;
+            nros[inicio] = i;
+            fireback(inicio+1, i);
+            visitado[i] = 0;
+        }
 }
 
 int main()
 {
-	int streetcorners, x, y, i;
-	std::string res;
-	nroCase = 0;
+    int x, y, i, k, j;
+    nroCase = 0;
 
+    while(scanf("%d",&streetcorners)!=EOF)
+    {
+            nroCase++;
+            countRoutes = 0;
+            max = 0;
+            for (i = 1; i <= 21; i++)
+            {
+                for (int j = 1; j <= 21; j++)
+                {
+                    matriz[i][j] = 0;
+                    aux[i][j] = 0;
+                }
+            }
+            while(scanf("%d %d",&x,&y),x||y)
+            {
+                max = std::max(max,std::max(x,y));
+                matriz[x][y] = matriz[y][x] = 1;
+                aux[x][y] = aux[y][x] = 1;
+            }
+            
+            for(k = 1;k <= max; k++)
+            {
+                for(i = 1;i <= max; i++)
+                {
+                    for(j = 1;j <= max; j++)
+                    {
+                        if(aux[i][k] && aux[k][j])
+                        {
+                            aux[i][j] = 1;
+                        }
+                    }
+                }
+            }
+            
+            visitado[1] = 1;
+            nros[0] = 1;
+            std::printf("CASE %d:\n", nroCase);
+            fireback(1, 1);
+            std::printf("There are %d routes from the firestation to streetcorner %d.\n", countRoutes, streetcorners);
+    }
 
-	while (std::cin >> streetcorners)
-	{
-		nroCase++;
-		countRoutes = 0;
-		for (i = 1; i <= 21; i++)
-		{
-			visitado[i] = 0;
-			for (int j = 1; j <= 21; j++)
-			{
-				matriz[i][j] = 0;
-			}
-		}
-
-		do
-		{
-			std::cin >> x >> y;
-			matriz[x][y] = 1;
-		} while (x != 0 && y != 0);
-
-		std::cout << "CASE " << nroCase << ":" << std::endl;
-		fireback(1, streetcorners, res);
-		std::cout << "There are " << countRoutes << " from the firestation to streetcorner " 
-			<< streetcorners << "." << std::endl;
-	}
-
-	return 0;
+    return 0;
 	
 }
