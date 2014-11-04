@@ -53,7 +53,9 @@ void queenBack(int col)
 int main()
 {
 	int i, j;
-	int nroCasos = 1;
+	int nroCasos = 0;
+	int testCases[10] = {0,0,0,0,0,0,0,0,0,0};
+
 	while (scanf("%d", &n) != EOF && n != 0)
 	{
 		qtde = 0;
@@ -66,9 +68,16 @@ int main()
 		}
 
 		queenBack(0);
-
-		printf("Case %d: %d\n", nroCasos, qtde);
-
+		testCases[nroCasos] = qtde;
+		nroCasos++;
 	}
+
+	i = 0;
+	while (testCases[i] != 0)
+	{
+		printf("Case %d: %d\n", i+1, testCases[i]);
+		i++;
+	}
+	
 	return 0;
 }
