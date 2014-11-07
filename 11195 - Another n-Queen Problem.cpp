@@ -1,79 +1,57 @@
 #include <cstdio>
-#include <iostream>
-#include <stack>
 
-#define TAM 15
-
-using namespace std;
+#define TAM 14
 
 int n;
 int qtde;
 int colQueen[TAM];
 int rowQueen[TAM];
+int diagonalNeg[TAM * 2];
+int diagonalPos[TAM * 2];
 char board[TAM][TAM];
-int passou[TAM][TAM];
 
-bool valida(int col, int row)
+void queenBack(int col, int inicio, int fim)
 {
-	int i;
-	if (board[col][row] == '*' || passou[col][row])
+	int i, iniTmp, fimTmp;
+	if (col == n)
 	{
-		return false;
+		qtde++;
+		return;
 	}
-	for (i = 0; i < col; i++)
+	for (i = inicio; i < fim; i++)
 	{
-		if (colQueen[i] == row ||
-			colQueen[i] - i == row - col ||
-			colQueen[i] + i == row + col)
+		if (!(board[col][i] == '*' || rowQueen[i] || diagonalNeg[i - col + n] || diagonalPos[i + col]))
 		{
-			return false;
-		}
-	}
-	return true;
-}
+			colQueen[col] = i;
+			rowQueen[i] = 1;
+			diagonalNeg[i - col + n] = 1;
+			diagonalPos[i + col] = 1;
 
-bool forRow(stack<int> &pilha)
-{
-	int i;
-	int top = pilha.top();
-	for (i = 0; i < n; i++)
-	{
-		if (valida(top, i))
-		{
-			colQueen[top] = i;
-			passou[top][i] = 1;
-			pilha.push(top + 1);
-			return true;
-		}
-	}
-	return false;
-}
+			iniTmp = inicio;
+			fimTmp = fim;
 
-void queenBack(int col)
-{
-	int i;
-	stack<int> pilha;
-	pilha.push(col);
+			if (i == inicio)
+			{
+				while (rowQueen[iniTmp] != 0)
+				{
+					iniTmp++;
+				}
+			}
+			else if (i == fim - 1)
+			{
+				while (rowQueen[fimTmp] != 0)
+				{
+					fimTmp--;
+				}
+			}
 
-	while (pilha.size() > 0)
-	{
-		int top = pilha.top();
-		if (top == n)
-		{
-			qtde++;
-			pilha.pop();
-			continue;
+			queenBack(col + 1, iniTmp, fimTmp);
+
+			colQueen[col] = 0;
+			rowQueen[i] = 0;
+			diagonalNeg[i - col + n] = 0;
+			diagonalPos[i + col] = 0;
 		}
-		if (forRow(pilha))
-		{
-			continue;
-		}
-		colQueen[top] = 0;
-		for (i = 0; i < n; i++)
-		{
-			passou[top][i] = 0;
-		}
-		pilha.pop();
 	}
 }
 
@@ -81,6 +59,7 @@ int main()
 {
 	int i, j;
 	int nroCasos = 1;
+
 	while (scanf("%d", &n) != EOF && n != 0)
 	{
 		qtde = 0;
@@ -89,11 +68,10 @@ int main()
 			for (j = 0; j < n; j++)
 			{
 				scanf(" %c", &board[i][j]);
-				passou[i][j] = 0;
 			}
 		}
 
-		queenBack(0);
+		queenBack(0, 0, n);
 
 		printf("Case %d: %d\n", nroCasos, qtde);
 		nroCasos++;
