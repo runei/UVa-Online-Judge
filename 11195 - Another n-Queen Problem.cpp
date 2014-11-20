@@ -20,7 +20,8 @@ void queenBack(int col, int inicio, int fim)
 	}
 	for (i = inicio; i < fim; i++)
 	{
-		if (!(board[col][i] == '*' || rowQueen[i] || diagonalNeg[i - col + n] || diagonalPos[i + col]))
+		int pos = ~(rowQueen[i] | diagonalNeg[i - col + n] | diagonalPos[i + col]);
+		if (pos & board[col][i] == '.')
 		{
 			colQueen[col] = i;
 			rowQueen[i] = 1;
@@ -73,8 +74,7 @@ int main()
 
 		queenBack(0, 0, n);
 
-		printf("Case %d: %d\n", nroCasos, qtde);
-		nroCasos++;
+		printf("Case %d: %d\n", nroCasos++, qtde);
 	}
 	return 0;
 }
